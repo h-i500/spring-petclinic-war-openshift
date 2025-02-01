@@ -1,4 +1,8 @@
+# target/ディレクトリ全体を無視
 target/*
+# ただし、warファイルは無視しない
+!target/*.war
+
 bin/*
 build/*
 .gradle/*
