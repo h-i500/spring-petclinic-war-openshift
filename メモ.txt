@@ -1,0 +1,121 @@
+
+【手順】
+git clone https://github.com/spring-projects/spring-petclinic.git
+
+
+＜変更＞
+ 
+pom.xml
+~~~
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.1.0</version>
+  </parent>
+  <!-- <name>petclinic</name> -->
+  <name>liberty-spring-petclinic</name>
+  <packaging>war</packaging>
+
+  <properties>
+
+~~~
+~~~
+  </dependencies>
+
+  <build>
+    <finalName>liberty-spring-petclinic</finalName>
+    <plugins>
+      <plugin>
+        <groupId>io.spring.javaformat</groupId>
+~~~
+
+~~~
+          <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
+        </configuration>
+      </plugin>
+      <plugin>
+    <groupId>io.openliberty.tools</groupId>
+    <artifactId>liberty-maven-plugin</artifactId>
+    <version>3.8.1</version>
+    <configuration>
+        <runtimeArtifact>
+            <groupId>io.openliberty</groupId>
+            <artifactId>openliberty-webProfile10</artifactId>
+            <version>23.0.0.5</version>
+            <type>zip</type>
+        </runtimeArtifact>
+        <looseApplication>false</looseApplication>
+    </configuration>
+</plugin>
+
+    </plugins>
+  </build>
+~~~
+
+
+
+
+src/main/java/org/springframework/samples/petclinic/PetClinicServletInitializer.java
+
+/*******************************************************************************
+ * Copyright (c) 2023 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License 2.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-2.0/
+ * 
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ *******************************************************************************/
+package org.springframework.samples.petclinic;
+
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+
+public class PetClinicServletInitializer extends SpringBootServletInitializer {
+
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(PetClinicApplication.class);
+	}
+
+}
+
+
+＜コマンドでの起動確認＞
+$ ./mvn spring-javaformat:apply
+$ ./mvnw clean
+$ ./mvnw package -Dmaven.test.skip
+$ ./mvnw liberty:run
+
+
+＜Podmanでの起動確認＞
+
+src/main/liberty/config/server.xmlを変更
+~~~
+    <!-- Enable features -->
+    <featureManager>
+        <!-- <feature>javaee-8.0</feature> -->
+        <feature>springBoot-3.0</feature>
+        <feature>servlet-6.0</feature>
+    </featureManager>
+~~~
+
+## WARファイル生成
+# mvn clean package
+
+## podman実行コマンド
+# podman build -t liberty-spring-petclinic .
+# podman run -d -p 9080:9080 liberty-spring-petclinic
+# curl http://localhost:9080/liberty-spring-petclinic/ 
+
+
+
+
+＜参考＞
+Running a Spring Boot 3.x application WAR file on Liberty
+https://openliberty.io/blog/2023/06/15/running-spring-boot-3.html
+
+see this change comparison on GitHub.
+https://github.com/spring-projects/spring-petclinic/compare/cf6d44b045f6cafe6c2c50b38d9de39389801ba5...cbridgha:spring-petclinic:RunAsWarOnLiberty/
+
+Spring Boot 3.0 support and new security capabilities in Open Liberty 23.0.0.9
+https://openliberty.io/blog/2023/09/19/23.0.0.9.html
